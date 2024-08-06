@@ -45,7 +45,7 @@
 /*      Reset                    */
 /* ----------------------------- */
 
-/* use the following to reference common resest:  https://piccalil.li/blog/a-modern-css-reset/ */
+/* reference for common resest:  https://piccalil.li/blog/a-modern-css-reset/ */
 
 /* Box Sizing */
 *,
@@ -78,23 +78,22 @@ p {
 }
 /* set up body */
 body {
-    background-color: hsl(var(--clr-dark) );
-    color: hsl(var(--clr-white));
     font-family: var(--ff-sans-normal);
     font-size: var(--fs-400);
+    color: hsl(var(--clr-white));
+    background-color: hsl(var(--clr-dark) );
     line-height: 1.5;
     min-height: 100vh;
     display: grid;
     grid-template-rows: min-content 1fr;
+    overflow-x: hidden;
 }
-
 /* make images easier to work with */
 img,
 picture {
     max-width: 100%;
     display: block;
 }
-
 /* make form elements easier to work with */
 input, 
 button,
@@ -102,7 +101,6 @@ textarea,
 select {
     font: inherit;
 }
-
 /* remove animations for people who have turned them off */
 @media (prefers-reduced-motion: reduce) {
     *, 
@@ -135,7 +133,6 @@ select {
 .flow>*:where(:not(:first-child)) {
     margin-top: var(--flow-space, 1rem);
 }
-
 .container {
     padding-inline: 2em; /* prevents page from running to the edge*/
     margin-inline: auto;
@@ -154,7 +151,7 @@ select {
     .grid-container {
         text-align: left;
         column-gap: var(--container-gap, 2rem);
-        grid-template-columns: minmax(1rem, 1fr) repeat(2, minmax(0, 40rem)) minmax(1rem, 1fr); /*may increase or decrease 40rem*/
+        grid-template-columns: minmax(1rem, 1fr) repeat(2, minmax(0, 30rem)) minmax(1rem, 1fr); /*may increase or decrease 30rem*/
     }
     .grid-container>*:first-child {
         grid-column: 2;
@@ -181,7 +178,19 @@ select {
     white-space: nowrap; /* add line */
     border: 0;
 }
-
+.skip-to-content {
+    background: hsl(var(--clr-white) );
+    color: hsl(var(--clr-dark) );
+    padding: .5em 1em;
+    margin-inline: auto;
+    z-index: 9999;
+    position: absolute;
+    transform: translateY(-100%);
+transition: transform 250ms ease-in;
+}
+.skip-to-content:focus {
+    transform: translateY(0);
+}
 /* colors */
 .bg-dark {background-color: hsl(var(--clr-dark) );}
 .bg-accent {background-color: hsl(var(--clr-light) );}
@@ -258,19 +267,35 @@ select {
     height: 100%;
     border-radius: 50%;
     opacity: 0;
-    transition: opacity 500ms linear, 750ms ease-in-out;
+    transition: opacity 500ms linear, transform 750ms ease-in-out;
 }
 .large-button:hover::after,
 .large-button:focus::after {
     opacity: 1;
     transform: scale(1.5);
 }
+/* primary header */
+.logo {
+    margin: 1.5rem clamp(1.5rem, 5vw, 3.5rem);
+}
+.primary-header {
+    justify-content: space-between;
+    align-items: center;
+}
 .primary-navigation {
-    --gap: 8rem;
+    --gap: clamp(1.5rem, 5vw, 3.5rem);
     --underline-gap: 2rem;
     list-style: none;
     padding: 0;
     margin: 0;
+    background-color: hsl(var(--clr-dark) / 0.95);
+}
+/* if browser supports backdrop-filter (glass morphism effect) */
+@supports (backdrop-filter: blur(2rem)) {
+.primary-navigation {
+    background-color: hsl(var(--clr-white) / 0.05);
+    backdrop-filter: blur(1.5rem);
+    }
 }
 .primary-navigation a {
     text-decoration: none;
@@ -279,12 +304,84 @@ select {
     font-weight: 700;
     margin-right: .5em;
 }
-/* every direct descendent of .underline-indicators */
+.mobile-nav-toggle {
+    display: none;
+}
+@media (max-width: 35em) {
+    .primary-navigation {
+        --underline-gap: .5rem;
+        position: fixed;
+        z-index: 1000;
+        inset: 0 0 0 30%;
+        list-style: none;
+        padding: min(20rem, 15vh) 2rem;
+        margin: 0;
+        flex-direction: column;
+        transform: translateX(100%);
+        transition: transform 500ms ease-in-out;
+    }
+    .primary-navigation[data-visible="true"] {
+        transform: translateX(0);
+    }
+    .primary-navigation.underline-indicators>.active {
+        border: 0;
+    }
+    .mobile-nav-toggle {
+        display: block;
+        position: absolute;
+        z-index: 2000;
+        right: 1rem;
+        top: 2rem;
+        background: transparent;
+        border: 0;
+        background-image: url(../assets/shared/icon-hamburger.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 1.5rem;
+        aspect-ratio: 1;
+    }
+    .mobile-nav-toggle[aria-expanded="true"] {
+        background-image: url(../assets/shared/icon-close.svg);
+    }
+    .mobile-nav-toggle:focus-visible {
+        outline: 5px solid white;
+        outline-offset: 5px;
+    }
+}
+@media (min-width: 35em) {
+    .primary-navigation {
+        padding-inline: clamp(3rem, 7vw, 7rem);    
+    }
+}
+@media (min-width: 35em) and (max-width: 44.999em) {
+    .primary-navigation a > span {
+        display: none;
+    }
+}
+@media (min-width: 45em) {
+    .primary-header::after {
+        content: '';
+        display: block;
+        position: relative;
+        height: 1px;
+        width: 100%;
+        margin-right: -2.5rem;;
+        background: hsl(var(--clr-white) / .25);
+        order: 1;
+    }
+    nav {
+        order: 2;
+    }
+    .primary-navigation {
+        margin-block: 2em;
+    }
+}
+/*every direct descendent of .underline-indicators */
 .underline-indicators>* {
-    padding: var(--underline-gap, 1rem) 0;
     border: 0;
     cursor: pointer;
     border-bottom: .2rem solid hsl(var(--clr-white) / 0 );
+    padding: var(--underline-gap, 1rem) 0;
 }
 .underline-indicators>*:hover, 
 .underline-indicators>*:focus {
@@ -303,7 +400,6 @@ select {
     cursor: pointer;
     border: 0;
     border-radius: 50%;
-    aspect-ratio: 1;
     padding: .5em;
     background-color: hsl(var(--clr-white) / .25 );
 }
